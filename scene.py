@@ -1,6 +1,6 @@
 from manim import *
-
-class ImageFromArray(MovingCameraScene):
+# RUN " manim -pqh scene.py DeepCut " from terminal to render scene 
+class DeepCut(MovingCameraScene):
 
     def construct(self):
         #####################################################################
