@@ -1,5 +1,5 @@
 from manim import *
-# RUN " manim -pqh scene.py DeepCut " from terminal to render scene 
+
 class DeepCut(MovingCameraScene):
 
     def construct(self):
@@ -20,7 +20,7 @@ class DeepCut(MovingCameraScene):
         self.play(FadeOut(deepcut))
 
         
-        self.play(self.camera.frame.animate.set(width=20))
+        self.play(self.camera.frame.animate.set(width=20), run_time=0.01)
         #####################################################################
         # image
         #####################################################################        
@@ -40,7 +40,7 @@ class DeepCut(MovingCameraScene):
         
         self.play(FadeIn(image))
         self.play(Create(im_tex))
-        self.wait(2)
+        self.wait(1)
         #####################################################################
         # ViT
         #####################################################################      
@@ -56,7 +56,7 @@ class DeepCut(MovingCameraScene):
         self.wait(1)
         # move image into ViT
         self.add(image2)
-        self.play(image2.animate.shift(5.20*RIGHT), run_time=3)
+        self.play(image2.animate.shift(5.20*RIGHT), run_time=2)
         
         #####################################################################
         # embadding vector
@@ -72,15 +72,21 @@ class DeepCut(MovingCameraScene):
         self.play(Create(F.rotate(PI / 2)))
         self.add(F_t.rotate(-PI / 2))
         self.add(vec_ind.rotate(-PI / 2))
+        
+        im_tex = Tex("F").scale(1).move_to(np.array((4.4, -2.5, 0.0)))
+        im_tex3 = Tex("Deep  \ features  \ vecor").scale(0.75).move_to(np.array((4.4, -3, 0.0)))
+        im_vg = VGroup(im_tex, im_tex3)
+        self.play(Create(im_vg))
+        self.wait(4)
 
         self.play(F_t.animate.rotate(PI / 2).shift(3*RIGHT))
-        self.play(self.camera.frame.animate.move_to(F_t))
-        im_tex = Tex("Deep  \ features  \ vecor \ F ").scale(1).move_to(np.array((7.0, -2.5, 0.0)))
-        self.play(Create(im_tex))
-        self.wait(2)
-        
         im2_tex = Tex("$F * F^T$").scale(1).move_to(np.array((7.0, -2.5, 0.0)))
-        self.play(ReplacementTransform(im_tex, im2_tex))
+        self.play(ReplacementTransform(im_vg, im2_tex))
+        
+        self.play(self.camera.frame.animate.move_to(F_t))
+        
+
+        
         #####################################################################
         # Matrix
         #####################################################################
@@ -89,7 +95,7 @@ class DeepCut(MovingCameraScene):
         self.play(Create(m2),run_time=1.5)
         im_tex = Tex("Correlation \ matrix").scale(1).next_to(m2,DOWN)
         self.play(Create(im_tex))
-        self.wait(4)
+        self.wait(5)
 
         self.play(self.camera.frame.animate.move_to(RIGHT * 20))
 
@@ -112,13 +118,20 @@ class DeepCut(MovingCameraScene):
 
         G.next_to(m2, buff=2)
         self.play(Create(G), run_time=2)
-        im_tex = Tex("Correlation \ graph").scale(1).next_to(G,DOWN)
-        self.play(Create(im_tex))
-        self.wait(5)
+        im_tex = Tex("G(V,E)").scale(1).move_to(G.get_bottom() - np.array((0.5, 0.5, 0.0)))
+
+        
+        im_tex5 = Tex("V = Image patches").scale(1).move_to(G.get_bottom() + np.array((5, 4, 0.0)))
+        im_tex55 = Tex("E = Correlation between patches").scale(1).move_to(G.get_bottom() + np.array((5, 3, 0.0)))
+        
+        graph_tex = VGroup(im_tex5,im_tex55, im_tex)
+
+        self.play(Create(graph_tex))
+        self.wait(10)
         G.remove_edges((1,9),(2,10))
-        im2_tex = Tex("Clustered \ graph").scale(1).next_to(G,DOWN)
-        self.play(ReplacementTransform(im_tex, im2_tex))
-        self.wait(5)
+        im2_tex = Tex("Clustered \ graph").scale(1).move_to(G.get_bottom() - np.array((0.5, 0.5, 0.0)))
+        self.play(ReplacementTransform(graph_tex, im2_tex))
+        self.wait(7)
 
         #####################################################################
         # Load Mask
@@ -131,7 +144,7 @@ class DeepCut(MovingCameraScene):
         # self.add(image_m)
         self.play(image_m.animate.set_opacity(1))
         im_tex = Tex("Output \ mask").scale(1).next_to(image_m,DOWN)
-        self.add(im_tex)
+        self.play(Create(im_tex))
         self.wait(3)
 
         self.play(self.camera.frame.animate.move_to(np.array((10.0, 0.0, 0.0))).set(width=39))
